@@ -13,6 +13,7 @@ class JokeList extends Component {
       jokes: JSON.parse(window.localStorage.getItem("jokes") || "[]"),
       loading: false
     }
+    this.seenJokes = new Set(this.state.jokes.map(joke => joke.id));
     this.handleVote = this.handleVote.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
@@ -20,19 +21,31 @@ class JokeList extends Component {
     if (this.state.jokes.length === 0) this.getJokes();
   }
   async getJokes(){
-    let jokes = [];
-    while(jokes.length < this.props.numJokesToGet){
-      let res = await axios.get('https://icanhazdadjoke.com/', {
-        headers: { Accept: 'application/json' }
-      });
-      jokes.push({ ...res.data, score: 0 });
+    try{
+      let jokes = [];
+      while(jokes.length < this.props.numJokesToGet){
+        let res = await axios.get('https://icanhazdadjoke.com/', {
+          headers: { Accept: 'application/json' }
+        });
+        let newJoke = res.data;
+        if (!this.seenJokes.has(newJoke.id)) {
+          jokes.push({id: newJoke.id, joke: newJoke.joke, score: 0 });
+          this.seenJokes.add(newJoke.id);
+        } else {
+          console.log("FOUND A DUPLICATE");
+          console.log(newJoke);
+        }
+      }
+      this.setState(st => ({
+        loading: false,
+        jokes: [...st.jokes, ...jokes]
+      }),
+      () => window.localStorage.setItem("jokes", JSON.stringify(this.state.jokes))
+      );
+    } catch(e) {
+      alert(e);
+      this.setState({ loading: false });
     }
-    this.setState(st => ({
-      loading: false,
-      jokes: [...st.jokes, ...jokes]
-    }),
-    () => window.localStorage.setItem("jokes", JSON.stringify(this.state.jokes))
-    );
   }
   handleVote(id, delta){
     this.setState(st => ({
