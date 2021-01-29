@@ -44,7 +44,7 @@ The app displays an interface that looks like this:
 
 ### Poject status
 
-The project is ongoing.
+The project is done.
 
 ### Credits & Sources
 
