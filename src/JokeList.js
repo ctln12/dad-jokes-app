@@ -67,6 +67,7 @@ class JokeList extends Component {
         </div>
       )
     }
+    let jokes = this.state.jokes.sort((a,b) => b.score - a.score);
     return (
       <div className="JokeList">
         <div className="JokeList-sidebar">
@@ -75,7 +76,7 @@ class JokeList extends Component {
           <button className="JokeList-getmore" onClick={this.handleClick}>New jokes</button>
         </div>
         <div className="JokeList-jokes">
-          {this.state.jokes.map(joke => (
+          {jokes.map(joke => (
             <Joke
               joke={joke.joke}
               score={joke.score}
